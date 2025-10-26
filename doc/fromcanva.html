@@ -298,7 +298,6 @@
                         rows="2"
                     ></textarea>
                     <div class="char-count" id="charCount">0 / 50</div>
-                    <button class="login-btn" onclick="postMessage()" style="margin-top: 12px;">投稿</button>
                 </div>
             </div>
             <div class="timeline-content" id="timelineContent">
@@ -311,10 +310,21 @@
     </div>
 
     <script>
-        const API_BASE = '/api';
         let currentUser = '';
         let posts = [];
-        let pollingInterval = null;
+        
+        // ローカルストレージから投稿を読み込む
+        function loadPostsFromStorage() {
+            const saved = localStorage.getItem('posts');
+            if (saved) {
+                posts = JSON.parse(saved);
+            }
+        }
+        
+        // ローカルストレージに投稿を保存
+        function savePostsToStorage() {
+            localStorage.setItem('posts', JSON.stringify(posts));
+        }
 
         // クッキー管理関数
         function setCookie(name, value, days) {
@@ -340,12 +350,12 @@
 
         // ページ読み込み時にログイン状態をチェック
         window.addEventListener('DOMContentLoaded', function() {
+            loadPostsFromStorage();
             const savedUser = getCookie('username');
             if (savedUser) {
                 currentUser = savedUser;
                 showTimeline();
-                loadAndRenderTimeline();
-                startPolling();
+                renderTimeline();
             } else {
                 document.getElementById('loginScreen').classList.remove('hidden');
             }
@@ -364,7 +374,7 @@
             setCookie('username', name, 30); // 30日間有効
             
             showTimeline();
-            startPolling();
+            renderTimeline();
         }
 
         function showTimeline() {
@@ -377,10 +387,6 @@
             if (confirm('ログアウトしますか？')) {
                 deleteCookie('username');
                 currentUser = '';
-                posts = [];
-                if (pollingInterval) {
-                    clearInterval(pollingInterval);
-                }
                 document.getElementById('timelineScreen').style.display = 'none';
                 document.getElementById('loginScreen').classList.remove('hidden');
                 document.getElementById('nameInput').value = '';
@@ -406,7 +412,7 @@
             }
         });
 
-        async function postMessage() {
+        function postMessage() {
             const postInput = document.getElementById('postInput');
             const content = postInput.value.trim();
             
@@ -421,29 +427,17 @@
                 timestamp: now.toISOString()
             };
             
-            // ローカルストレージに保存（モックアップ）
-            const localPosts = JSON.parse(localStorage.getItem('posts') || '[]');
-            localPosts.push(post);
-            localStorage.setItem('posts', JSON.stringify(localPosts));
+            // 投稿を配列の先頭に追加
+            posts.unshift(post);
+            savePostsToStorage();
             
+            // 入力をクリア
             postInput.value = '';
             document.getElementById('charCount').textContent = '0 / 50';
             document.getElementById('charCount').classList.remove('warning');
             
             // タイムラインを更新
-            await loadAndRenderTimeline();
-        }
-
-        async function loadAndRenderTimeline() {
-            // ローカルストレージから読み込み（モックアップ）
-            const localPosts = JSON.parse(localStorage.getItem('posts') || '[]');
-            posts = localPosts || [];
             renderTimeline();
-        }
-
-        function startPolling() {
-            // ローカルストレージからタイムラインを読み込み
-            loadAndRenderTimeline();
         }
 
         function renderTimeline() {
