@@ -110,8 +110,11 @@ app.get('/', (req, res) => {
 });
 
 // サーバー起動
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`サーバーを起動しました`);
-    console.log(`http://localhost:${PORT}`);
+    console.log(`\nローカルアクセス:`);
+    console.log(`  http://localhost:${PORT}`);
+    console.log(`\nチームメンバーは以下のURLにアクセスしてください:`);
+    console.log(`  http://192.168.212.132:${PORT}`);
     console.log(`\nサーバーを停止するには Ctrl+C を押してください`);
 });
