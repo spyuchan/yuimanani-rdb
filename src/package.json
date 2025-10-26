@@ -1,0 +1,20 @@
+{
+  "name": "yuimanani-timeline",
+  "version": "1.0.0",
+  "description": "いまなにしてる？タイムラインアプリ",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "body-parser": "^1.20.2",
+    "cookie-parser": "^1.4.6"
+  }
+}
+

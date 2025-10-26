@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>いまなにしてる？</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100%;
+            padding: 0;
+        }
+
+        html {
+            height: 100%;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100%;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ログイン画面 */
+        .login-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100%;
+            padding: 40px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .login-screen h1 {
+            font-size: 32px;
+            color: white;
+            margin-bottom: 12px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .login-screen p {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 360px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-box label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            margin-bottom: 24px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .login-box input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* タイムライン画面 */
+        .timeline-screen {
+            display: none;
+            min-height: 100%;
+        }
+
+        .timeline-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px 20px 24px;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .timeline-header h2 {
+            font-size: 24px;
+            margin-bottom: 16px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .post-box {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .post-input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            font-size: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            resize: none;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .post-input:focus {
+            outline: none;
+            border-color: white;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .char-count {
+            text-align: right;
+            margin-top: 8px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+        }
+
+        .char-count.warning {
+            color: #ff6b6b;
+        }
+
+        .timeline-content {
+            padding: 20px;
+            background: #f8f9fa;
+            min-height: calc(100% - 200px);
+        }
+
+        .post-item {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .post-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .post-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 18px;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .post-info {
+            flex: 1;
+        }
+
+        .post-author {
+            font-weight: 700;
+            font-size: 15px;
+            color: #333;
+            margin-bottom: 2px;
+        }
+
+        .post-time {
+            font-size: 13px;
+            color: #999;
+        }
+
+        .post-content {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ログイン画面 -->
+        <div class="login-screen" id="loginScreen">
+            <h1>✨ いまなにしてる？</h1>
+            <p>今の気持ちをシェアしよう</p>
+            <div class="login-box">
+                <label for="nameInput">なまえ</label>
+                <input type="text" id="nameInput" placeholder="ニックネームを入力">
+                <button class="login-btn" id="loginBtn" onclick="login()">ログイン</button>
+            </div>
+        </div>
+
+        <!-- タイムライン画面 -->
+        <div class="timeline-screen" id="timelineScreen">
+            <div class="timeline-header">
+                <button class="logout-btn" onclick="logout()">ログアウト</button>
+                <h2>いまなにしてる？</h2>
+                <div class="post-box">
+                    <textarea 
+                        class="post-input" 
+                        id="postInput" 
+                        placeholder="今何してる？"
+                        maxlength="50"
+                        rows="2"
+                    ></textarea>
+                    <div class="char-count" id="charCount">0 / 50</div>
+                </div>
+            </div>
+            <div class="timeline-content" id="timelineContent">
+                <div class="empty-state">
+                    <div class="empty-state-icon">💭</div>
+                    <p>まだ投稿がありません<br>最初の投稿をしてみよう！</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = '';
+        let posts = [];
+        let lastPostId = 0;
+        let pollInterval = null;
+
+        // API呼び出し関数
+        async function apiCall(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    }
+                });
+                return await response.json();
+            } catch (error) {
+                console.error('API呼び出しエラー:', error);
+                return null;
+            }
+        }
+
+        // ページ読み込み時にログイン状態をチェック
+        async function checkAuth() {
+            const result = await apiCall('/api/auth/check');
+            if (result && result.authenticated) {
+                currentUser = result.username;
+                showTimeline();
+                loadTimeline();
+                startPolling();
+            } else {
+                document.getElementById('loginScreen').classList.remove('hidden');
+            }
+        }
+
+        async function login() {
+            const nameInput = document.getElementById('nameInput');
+            const loginBtn = document.getElementById('loginBtn');
+            const name = nameInput.value.trim();
+            
+            if (name === '') {
+                nameInput.style.borderColor = '#ff6b6b';
+                return;
+            }
+            
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'ログイン中...';
+            
+            const result = await apiCall('/api/login', {
+                method: 'POST',
+                body: JSON.stringify({ username: name })
+            });
+            
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'ログイン';
+            
+            if (result && result.success) {
+                currentUser = result.user.username;
+                nameInput.value = '';
+                showTimeline();
+                loadTimeline();
+                startPolling();
+            } else {
+                alert('ログインに失敗しました');
+            }
+        }
+
+        function showTimeline() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('timelineScreen').style.display = 'block';
+            document.getElementById('postInput').focus();
+        }
+
+        async function logout() {
+            if (confirm('ログアウトしますか？')) {
+                await apiCall('/api/logout', { method: 'POST' });
+                currentUser = '';
+                stopPolling();
+                document.getElementById('timelineScreen').style.display = 'none';
+                document.getElementById('loginScreen').classList.remove('hidden');
+                document.getElementById('nameInput').value = '';
+                posts = [];
+                lastPostId = 0;
+            }
+        }
+
+        async function loadTimeline() {
+            const result = await apiCall('/api/timeline');
+            if (result && result.posts) {
+                posts = result.posts;
+                if (posts.length > 0) {
+                    lastPostId = posts[0].id;
+                }
+                renderTimeline();
+            }
+        }
+
+        async function checkNewPosts() {
+            const result = await apiCall(`/api/timeline/new?lastId=${lastPostId}`);
+            if (result && result.posts && result.posts.length > 0) {
+                // 新しい投稿を先頭に追加
+                posts = [...result.posts, ...posts].slice(0, 1000);
+                lastPostId = result.posts[0].id;
+                renderTimeline();
+            }
+        }
+
+        function startPolling() {
+            stopPolling();
+            pollInterval = setInterval(checkNewPosts, 3000); // 3秒おき
+        }
+
+        function stopPolling() {
+            if (pollInterval) {
+                clearInterval(pollInterval);
+                pollInterval = null;
+            }
+        }
+
+        document.getElementById('postInput').addEventListener('input', function(e) {
+            const length = e.target.value.length;
+            const charCount = document.getElementById('charCount');
+            charCount.textContent = `${length} / 50`;
+            
+            if (length >= 45) {
+                charCount.classList.add('warning');
+            } else {
+                charCount.classList.remove('warning');
+            }
+        });
+
+        document.getElementById('postInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                postMessage();
+            }
+        });
+
+        async function postMessage() {
+            const postInput = document.getElementById('postInput');
+            const content = postInput.value.trim();
+            
+            if (content === '' || !currentUser) {
+                return;
+            }
+            
+            const result = await apiCall('/api/posts', {
+                method: 'POST',
+                body: JSON.stringify({ content })
+            });
+            
+            if (result && result.success) {
+                postInput.value = '';
+                document.getElementById('charCount').textContent = '0 / 50';
+                document.getElementById('charCount').classList.remove('warning');
+                
+                // 自分の投稿を先頭に追加
+                posts.unshift(result.post);
+                lastPostId = result.post.id;
+                renderTimeline();
+            } else {
+                alert('投稿に失敗しました');
+            }
+        }
+
+        function renderTimeline() {
+            const timelineContent = document.getElementById('timelineContent');
+            
+            if (posts.length === 0) {
+                timelineContent.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💭</div>
+                        <p>まだ投稿がありません<br>最初の投稿をしてみよう！</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            timelineContent.innerHTML = posts.map(post => {
+                // created_atはISO形式で来るので、パースして表示
+                const timestamp = new Date(post.created_at);
+                const date = timestamp.toLocaleDateString('ja-JP', { month: 'long', day: 'numeric' });
+                const time = timestamp.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
+                
+                return `
+                    <div class="post-item">
+                        <div class="post-header">
+                            <div class="post-avatar">${escapeHtml(post.username).charAt(0)}</div>
+                            <div class="post-info">
+                                <div class="post-author">${escapeHtml(post.username)}</div>
+                                <div class="post-time">${date} ${time}</div>
+                            </div>
+                        </div>
+                        <div class="post-content">${escapeHtml(post.content)}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // XSS対策
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // エンターキーでログイン
+        document.getElementById('nameInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                login();
+            }
+        });
+
+        // ページ読み込み時に認証チェック
+        window.addEventListener('DOMContentLoaded', checkAuth);
+    </script>
+</body>
+</html>
+
