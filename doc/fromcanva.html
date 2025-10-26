@@ -298,6 +298,7 @@
                         rows="2"
                     ></textarea>
                     <div class="char-count" id="charCount">0 / 50</div>
+                    <button class="login-btn" onclick="postMessage()" style="margin-top: 12px;">投稿</button>
                 </div>
             </div>
             <div class="timeline-content" id="timelineContent">
@@ -420,52 +421,29 @@
                 timestamp: now.toISOString()
             };
             
-            try {
-                const response = await fetch(`${API_BASE}/posts`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(post)
-                });
-                
-                if (response.ok) {
-                    postInput.value = '';
-                    document.getElementById('charCount').textContent = '0 / 50';
-                    document.getElementById('charCount').classList.remove('warning');
-                    
-                    // タイムラインを更新
-                    await loadAndRenderTimeline();
-                } else {
-                    alert('投稿に失敗しました');
-                }
-            } catch (error) {
-                console.error('Error posting:', error);
-                alert('投稿に失敗しました');
-            }
+            // ローカルストレージに保存（モックアップ）
+            const localPosts = JSON.parse(localStorage.getItem('posts') || '[]');
+            localPosts.push(post);
+            localStorage.setItem('posts', JSON.stringify(localPosts));
+            
+            postInput.value = '';
+            document.getElementById('charCount').textContent = '0 / 50';
+            document.getElementById('charCount').classList.remove('warning');
+            
+            // タイムラインを更新
+            await loadAndRenderTimeline();
         }
 
         async function loadAndRenderTimeline() {
-            try {
-                const response = await fetch(`${API_BASE}/posts`);
-                if (response.ok) {
-                    const data = await response.json();
-                    posts = data.posts || [];
-                    renderTimeline();
-                } else {
-                    console.error('Failed to load timeline');
-                }
-            } catch (error) {
-                console.error('Error loading timeline:', error);
-            }
+            // ローカルストレージから読み込み（モックアップ）
+            const localPosts = JSON.parse(localStorage.getItem('posts') || '[]');
+            posts = localPosts || [];
+            renderTimeline();
         }
 
         function startPolling() {
-            // 3秒おきにタイムラインを更新
-            if (pollingInterval) {
-                clearInterval(pollingInterval);
-            }
-            pollingInterval = setInterval(loadAndRenderTimeline, 3000);
+            // ローカルストレージからタイムラインを読み込み
+            loadAndRenderTimeline();
         }
 
         function renderTimeline() {
@@ -501,5 +479,5 @@
             }).join('');
         }
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'994932d3073e067d',t:'MTc2MTQ3Mzc5MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
